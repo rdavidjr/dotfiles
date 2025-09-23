@@ -1,0 +1,15 @@
+# Read the current default terminal set in MATE
+CURRENT_TERMINAL=$(dconf read /org/mate/desktop/applications/terminal/exec)
+
+# Target terminal
+DESIRED_TERMINAL="xfce4-terminal.wrapper"
+
+# Compare and set if different
+if [ "$CURRENT_TERMINAL" != "$DESIRED_TERMINAL" ]; then
+    echo "Changing MATE default terminal to" "$DESIRED_TERMINAL"
+    dconf write /org/mate/desktop/applications/terminal/exec "'$DESIRED_TERMINAL'"
+else
+    echo "MATE default terminal is already set to" "$DESIRED_TERMINAL" 
+fi
+
+[ -z "$ZSH_VERSION" ] && exec zsh
