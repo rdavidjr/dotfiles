@@ -78,4 +78,16 @@ return {
             require "configs.ufo"
         end,
     },
+    {
+        "nvim-tree/nvim-tree.lua",
+        opts = {
+            view = {
+                adaptive_size = true, -- <--- This automatically resizes the window
+                -- width = {
+                --     min = 30,
+                --     max = 50, -- Adjust or remove this line based on preference
+                -- },
+            },
+        },
+    },
 }
