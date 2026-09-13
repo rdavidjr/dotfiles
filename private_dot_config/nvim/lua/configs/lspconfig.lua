@@ -26,7 +26,7 @@ vim.lsp.config("clangd", {
     cmd = {
         "clangd",
         "--background-index",
-        "--query-driver=usr/bin/arm_none_eabi_gcc,/usr/include/newlib",
+        "--query-driver=/usr/bin/arm-none-eabi-gcc,/usr/bin/arm-none-eabi-g++,/usr/include/newlib",
     },
     on_init = on_init,
     capabilities = capabilities,
