@@ -112,10 +112,11 @@ Use Nerd Fonts release zip (e.g. v3.4.0+ `JetBrainsMono.zip` from https://github
 | gcc | gcc | build-essential | *(Xcode CLT)* |
 | g++ | gcc-c++ | build-essential | *(Xcode CLT)* |
 | make | make | make | make |
+| luarocks (for Mason `luacheck`) | luarocks + lua-devel / compatible lua*-devel | luarocks liblua5.1-0-dev | luarocks |
 
 On macOS, ensure Xcode Command Line Tools: `xcode-select --install` if compilers are missing.
 
-**Why:** Treesitter builds parsers with a C/C++ compiler. Mason installs:
+**Why:** Treesitter builds parsers with a C/C++ compiler. Mason `luacheck` needs **luarocks** on PATH. Mason installs:
 
 - LSP: `lua_ls`, `clangd`, `pyright`
 - Formatters: `stylua`, `clang-format`, `isort`, `black`
@@ -137,13 +138,31 @@ If chezmoi source already exists, `chezmoi update` / `chezmoi apply` instead of 
 
 ### One-shot Neovim sync
 
-After chezmoi apply:
+After chezmoi apply, ensure **luarocks** is installed (Mason `luacheck` fails with “could not find luarocks” without it):
+
+```bash
+# Ubuntu/Debian
+sudo apt-get install -y luarocks liblua5.1-0-dev
+# Fedora
+# sudo dnf install -y luarocks lua-devel
+# macOS
+# brew install luarocks
+command -v luarocks
+```
+
+Then:
 
 ```bash
 nvim --headless "+Lazy! sync" "+MasonInstall lua-language-server clangd pyright stylua clang-format isort black luacheck flake8" "+qa"
 ```
 
-If MasonInstall fails partially, re-run or open nvim once interactively. Network is required.
+If MasonInstall fails partially (especially `luacheck`), install luarocks as above and re-run only:
+
+```bash
+nvim --headless "+MasonInstall luacheck" "+qa"
+```
+
+Network is required. Open nvim interactively once if headless sync still fails.
 
 ### TPM (tmux plugins)
 
@@ -192,7 +211,7 @@ Agent must run and report:
 command -v zsh git curl nvim tmux fzf chezmoi
 command -v bat batcat 2>/dev/null; command -v fd fdfind 2>/dev/null
 command -v lsd lazygit btop jq tree rg
-command -v node npm python3 gcc g++ make
+command -v node npm python3 gcc g++ make luarocks
 echo "SHELL=$SHELL"
 test -d "$HOME/.oh-my-zsh"
 test -f "$HOME/.zshrc"
@@ -202,11 +221,13 @@ nvim --version | head -1
 tmux -V
 chezmoi --version
 node -v
-# Mason bins (after sync):
-ls "$HOME/.local/share/nvim/mason/bin" 2>/dev/null | head
+luarocks --version | head -1
+# Mason bins (after sync) — expect luacheck among them:
+ls "$HOME/.local/share/nvim/mason/bin" 2>/dev/null
+"$HOME/.local/share/nvim/mason/bin/luacheck" --version 2>/dev/null | head -1
 ```
 
-Expect: zsh default (or noted if user declined chsh), configs present, mason bin dir populated with at least clangd, stylua, pyright (or clear note if install still running).
+Expect: zsh default (or noted if user declined chsh), configs present, `luarocks` on PATH, mason bin dir populated with at least clangd, stylua, pyright, and luacheck (or clear note if install still running).
 
 ---
 
